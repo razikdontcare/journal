@@ -1,0 +1,1 @@
+ALTER TABLE "site_settings" ADD COLUMN "allow_registration" boolean DEFAULT true NOT NULL;

@@ -1,0 +1,739 @@
+{
+  "id": "28760237-bf77-4c8b-b3de-787b37369f40",
+  "prevId": "d7d3b8f8-f679-4e89-8e85-18f7240dbf07",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "account_id": {
+          "name": "account_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
+          "tableFrom": "accounts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.articles": {
+      "name": "articles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subtitle": {
+          "name": "subtitle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "read_time": {
+          "name": "read_time",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author": {
+          "name": "author",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Journal'"
+        },
+        "hero_image": {
+          "name": "hero_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "published": {
+          "name": "published",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "articles_author_id_users_id_fk": {
+          "name": "articles_author_id_users_id_fk",
+          "tableFrom": "articles",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "articles_slug_unique": {
+          "name": "articles_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessions_token_unique": {
+          "name": "sessions_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.site_settings": {
+      "name": "site_settings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "'default'"
+        },
+        "site_name": {
+          "name": "site_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Journal'"
+        },
+        "site_tagline": {
+          "name": "site_tagline",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'A personal blog about life, thoughts, and creativity.'"
+        },
+        "site_description": {
+          "name": "site_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Welcome to my personal blog where I share my thoughts, experiences, and creative endeavors.'"
+        },
+        "author_name": {
+          "name": "author_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Journal'"
+        },
+        "author_bio": {
+          "name": "author_bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_image": {
+          "name": "author_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_twitter": {
+          "name": "social_twitter",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_github": {
+          "name": "social_github",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_linkedin": {
+          "name": "social_linkedin",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_instagram": {
+          "name": "social_instagram",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "footer_text": {
+          "name": "footer_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'© 2025 Journal. All rights reserved.'"
+        },
+        "hero_title": {
+          "name": "hero_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Thoughts,'"
+        },
+        "hero_title_accent": {
+          "name": "hero_title_accent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'stories & ideas'"
+        },
+        "hero_description": {
+          "name": "hero_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'A space for reflection, creativity, and the quiet moments that shape who we become. Welcome to my corner of the internet.'"
+        },
+        "hero_image": {
+          "name": "hero_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'https://images.unsplash.com/photo-1516414447565-b14be0adf13e?w=800&q=80'"
+        },
+        "hero_cta_text": {
+          "name": "hero_cta_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Learn more about me →'"
+        },
+        "hero_cta_link": {
+          "name": "hero_cta_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'/about'"
+        },
+        "about_hero_title": {
+          "name": "about_hero_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Hello, I''m'"
+        },
+        "about_hero_subtitle": {
+          "name": "about_hero_subtitle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'a storyteller'"
+        },
+        "about_intro_title": {
+          "name": "about_intro_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'A little about me'"
+        },
+        "about_intro_paragraph1": {
+          "name": "about_intro_paragraph1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'I believe in the power of words to inspire, heal, and connect us. My writing explores the intersection of mindfulness, creativity, and everyday life—finding meaning in the mundane and beauty in the ordinary.'"
+        },
+        "about_intro_paragraph2": {
+          "name": "about_intro_paragraph2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'When I''m not writing, you''ll find me wandering through bookshops, experimenting in the kitchen, or getting lost in nature. I''m passionate about slow living, intentional design, and the art of doing nothing.'"
+        },
+        "about_intro_paragraph3": {
+          "name": "about_intro_paragraph3",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'This blog is my attempt to share what I''m learning along the way—imperfect thoughts, honest reflections, and the occasional moment of clarity. Thank you for being here.'"
+        },
+        "about_email": {
+          "name": "about_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'hello@journal.com'"
+        },
+        "about_image": {
+          "name": "about_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=80'"
+        },
+        "values_section_title": {
+          "name": "values_section_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'What I believe in'"
+        },
+        "value1_title": {
+          "name": "value1_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Intentionality'"
+        },
+        "value1_description": {
+          "name": "value1_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Every choice we make shapes our life. I believe in making those choices with purpose and awareness.'"
+        },
+        "value2_title": {
+          "name": "value2_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Simplicity'"
+        },
+        "value2_description": {
+          "name": "value2_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'In a world of excess, simplicity is a radical act. Less noise, more signal. Less clutter, more clarity.'"
+        },
+        "value3_title": {
+          "name": "value3_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Connection'"
+        },
+        "value3_description": {
+          "name": "value3_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'We''re all walking each other home. I believe in building bridges through stories and shared experiences.'"
+        },
+        "newsletter_title": {
+          "name": "newsletter_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Stay in touch'"
+        },
+        "newsletter_description": {
+          "name": "newsletter_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Subscribe to receive occasional updates, new posts, and thoughts delivered straight to your inbox.'"
+        },
+        "newsletter_image": {
+          "name": "newsletter_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80'"
+        },
+        "show_newsletter": {
+          "name": "show_newsletter",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "allow_registration": {
+          "name": "allow_registration",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email_verified": {
+          "name": "email_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.verifications": {
+      "name": "verifications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
