@@ -166,7 +166,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     if (article) {
       const savedArticles = JSON.parse(
-        localStorage.getItem("savedArticles") || "[]"
+        localStorage.getItem("savedArticles") || "[]",
       );
       setIsSaved(savedArticles.includes(article.slug));
     }
@@ -175,7 +175,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const handleSave = () => {
     if (!article) return;
     const savedArticles = JSON.parse(
-      localStorage.getItem("savedArticles") || "[]"
+      localStorage.getItem("savedArticles") || "[]",
     );
     if (isSaved) {
       const filtered = savedArticles.filter((s: string) => s !== article.slug);
@@ -212,7 +212,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     window.open(
       `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
       "_blank",
-      "width=550,height=420"
+      "width=550,height=420",
     );
   };
 
@@ -221,7 +221,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     window.open(
       `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
       "_blank",
-      "width=550,height=420"
+      "width=550,height=420",
     );
   };
 
@@ -333,7 +333,7 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
             {article.tags.map((tag) => (
               <Link
                 key={tag}
-                to={`/?tag=${encodeURIComponent(tag)}`}
+                to={`/articles?tag=${encodeURIComponent(tag)}`}
                 className="article-tag"
               >
                 #{tag}
