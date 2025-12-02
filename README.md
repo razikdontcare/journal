@@ -13,6 +13,7 @@ A personal journal built with React Router.
 - [Tiptap](https://tiptap.dev/) - Rich text editor
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [Better Auth](https://www.better-auth.com/) - Authentication
+- [S3](https://aws.amazon.com/s3/) - Image storage
 
 ## Development
 
