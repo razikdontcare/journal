@@ -15,6 +15,24 @@ A personal journal built with React Router.
 - [Better Auth](https://www.better-auth.com/) - Authentication
 - [S3](https://aws.amazon.com/s3/) - Image storage
 
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `BETTER_AUTH_URL` | Base URL for authentication | Yes |
+| `BETTER_AUTH_SECRET` | Secret key for auth sessions | Yes |
+| `S3_ENDPOINT` | S3-compatible storage endpoint | Yes |
+| `S3_BUCKET_NAME` | S3 bucket name | Yes |
+| `S3_ACCESS_KEY_ID` | S3 access key | Yes |
+| `S3_SECRET_ACCESS_KEY` | S3 secret key | Yes |
+| `S3_REGION` | S3 region | No |
+| `S3_PUBLIC_URL` | Public URL for uploaded files | No |
+| `S3_FORCE_PATH_STYLE` | Use path-style URLs | No |
+| `S3_BUCKET_ENDPOINT` | Treat endpoint as bucket URL | No |
+| `SITE_URL` | Public site URL for SEO | No |
+| `PORT` | Server port (default: 3000) | No |
+
 ## Development
 
 ```bash
