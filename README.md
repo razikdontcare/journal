@@ -4,6 +4,16 @@ A personal journal built with React Router.
 
 **Demo:** https://journal.razik.net
 
+## Tech Stack
+
+- [React Router](https://reactrouter.com/) - Full-stack React framework
+- [Bun](https://bun.sh/) - Package manager
+- [Node.js](https://nodejs.org/) - Runtime
+- [Drizzle](https://orm.drizzle.team/) - TypeScript ORM
+- [Tiptap](https://tiptap.dev/) - Rich text editor
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Better Auth](https://www.better-auth.com/) - Authentication
+
 ## Development
 
 ```bash
