@@ -33,6 +33,25 @@ A personal journal built with React Router.
 | `SITE_URL` | Public site URL for SEO | No |
 | `PORT` | Server port (default: 3000) | No |
 
+## Routes
+
+| Path | Description |
+|------|-------------|
+| `/` | Home page |
+| `/about` | About page |
+| `/articles` | Articles listing |
+| `/article/:slug` | Single article view |
+| `/login` | Login page |
+| `/register` | Registration page |
+| `/admin` | Admin dashboard |
+| `/admin/new` | Create new article |
+| `/admin/edit/:id` | Edit article |
+| `/admin/media` | Media library |
+| `/admin/users` | User management |
+| `/admin/profile` | User profile settings |
+| `/admin/settings` | Site settings |
+| `/api/upload` | Image upload endpoint (POST) |
+
 ## Development
 
 ```bash
