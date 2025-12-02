@@ -2,6 +2,8 @@
 
 A personal journal built with React Router.
 
+**Demo:** https://journal.razik.net
+
 ## Development
 
 ```bash
