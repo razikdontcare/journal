@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "cross-env NODE_ENV=development node server.js",
-    "start": "node server.js",
+    "dev": "cross-env NODE_ENV=development bun server.js",
+    "start": "bun server.js",
     "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
@@ -40,6 +40,7 @@
     "hast-util-to-html": "^9.0.5",
     "isbot": "^5.1.31",
     "lowlight": "^3.3.0",
+    "lucide-react": "^0.555.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "postgres": "^3.4.7",

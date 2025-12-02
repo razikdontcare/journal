@@ -48,13 +48,18 @@ router.post("/", upload.single("file"), async (req, res) => {
     const uint8Array = new Uint8Array(req.file.buffer);
     const blob = new Blob([uint8Array], { type: req.file.mimetype });
 
-    const result = await uploadImage(blob, req.file.originalname);
+    // Pass user ID to track who uploaded the file
+    const result = await uploadImage(
+      blob,
+      req.file.originalname,
+      session.user.id
+    );
 
     if (!result.success) {
       return res.status(400).json({ error: result.error });
     }
 
-    return res.json({ url: result.url });
+    return res.json({ url: result.url, mediaId: result.mediaId });
   } catch (error) {
     console.error("Upload error:", error);
     return res.status(500).json({

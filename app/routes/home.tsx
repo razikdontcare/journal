@@ -17,20 +17,47 @@ export function meta({ data }: Route.MetaArgs) {
         settings?.siteTagline ||
         "A personal blog about life, thoughts, and creativity.",
     },
+    // Open Graph
+    { property: "og:title", content: settings?.siteName || "My Personal Blog" },
+    {
+      property: "og:description",
+      content:
+        settings?.siteTagline ||
+        "A personal blog about life, thoughts, and creativity.",
+    },
+    { property: "og:type", content: "website" },
+    { property: "og:image", content: settings?.heroImage || "" },
+    // Twitter Card
+    { name: "twitter:card", content: "summary_large_image" },
+    {
+      name: "twitter:title",
+      content: settings?.siteName || "My Personal Blog",
+    },
+    {
+      name: "twitter:description",
+      content:
+        settings?.siteTagline ||
+        "A personal blog about life, thoughts, and creativity.",
+    },
   ];
 }
 
 // Server-side loader
-export async function loader() {
-  const [articles, settings] = await Promise.all([
-    getPublishedArticles(),
+export async function loader({}: Route.LoaderArgs) {
+  const [articlesResult, settings] = await Promise.all([
+    getPublishedArticles({}, { page: 1, limit: 5 }),
     getSiteSettings(),
   ]);
-  return { articles, settings };
+
+  return {
+    articles: articlesResult.items,
+    totalArticles: articlesResult.total,
+    settings,
+  };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { articles, settings } = loaderData;
+  const { articles, totalArticles, settings } = loaderData;
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -104,15 +131,16 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <section className="journal-section" id="journal">
         <div className="section-header">
           <h2 className="section-title">Latest Entries</h2>
-          <span
+          <Link
+            to="/articles"
             style={{
               fontFamily: "var(--font-serif)",
               fontStyle: "italic",
               color: "var(--text-muted)",
             }}
           >
-            Explore all writings
-          </span>
+            View all {totalArticles} articles →
+          </Link>
         </div>
 
         {/* Article List */}
@@ -131,6 +159,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                   {article.subtitle || getExcerpt(article.content)}
                 </p>
               )}
+              {article.authorUser && (
+                <span className="item-author">
+                  by {article.authorUser.name}
+                </span>
+              )}
             </div>
             <span className="item-action">Read →</span>
           </Link>
@@ -146,6 +179,23 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           >
             No articles published yet.
           </p>
+        )}
+
+        {/* View All Link */}
+        {totalArticles > 5 && (
+          <div style={{ textAlign: "center", marginTop: "2rem" }}>
+            <Link
+              to="/articles"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                borderBottom: "1px solid var(--text-main)",
+                paddingBottom: "4px",
+              }}
+            >
+              Browse all articles →
+            </Link>
+          </div>
         )}
       </section>
 

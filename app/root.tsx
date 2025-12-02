@@ -46,30 +46,63 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
+  let status = 500;
+  let title = "Something went wrong";
+  let message = "An unexpected error occurred. Please try again later.";
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
+    status = error.status;
+    switch (error.status) {
+      case 404:
+        title = "Page not found";
+        message =
+          "The page you're looking for doesn't exist or has been moved.";
+        break;
+      case 401:
+        title = "Unauthorized";
+        message = "You need to be logged in to access this page.";
+        break;
+      case 403:
+        title = "Access denied";
+        message = "You don't have permission to access this page.";
+        break;
+      default:
+        title = "Something went wrong";
+        message = error.statusText || message;
+    }
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
+    message = error.message;
     stack = error.stack;
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <div className="error-page">
+      <div className="error-content">
+        <span className="error-status">{status}</span>
+        <h1 className="error-title">{title}</h1>
+        <p className="error-message">{message}</p>
+        <div className="error-actions">
+          <a href="/" className="error-btn error-btn-primary">
+            Go to Homepage
+          </a>
+          <button
+            type="button"
+            className="error-btn error-btn-secondary"
+            onClick={() => window.history.back()}
+          >
+            Go Back
+          </button>
+        </div>
+        {stack && (
+          <details className="error-stack">
+            <summary>Error Details</summary>
+            <pre>
+              <code>{stack}</code>
+            </pre>
+          </details>
+        )}
+      </div>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ import { getArticleBySlug, getPublishedArticles } from "../lib/articles.server";
 import { getSiteSettings } from "../lib/settings.server";
 import { getSession } from "../lib/auth.server";
 import { highlightCodeBlocks } from "../lib/highlight.server";
-import { type Article } from "../lib/utils";
+import { Bookmark, Share2, Twitter, Linkedin } from "lucide-react";
 
 // Server-side loader
 export async function loader({ request, params }: Route.LoaderArgs) {
@@ -28,6 +28,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       navigation: { prev: null, next: null },
       settings,
       isAuthenticated,
+      canonicalUrl: null,
     };
   }
 
@@ -39,13 +40,15 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       navigation: { prev: null, next: null },
       settings,
       isAuthenticated,
+      canonicalUrl: null,
     };
   }
 
   // Highlight code blocks in the article content
   const highlightedContent = highlightCodeBlocks(article.content);
 
-  const allArticles = await getPublishedArticles();
+  const allArticlesResult = await getPublishedArticles();
+  const allArticles = allArticlesResult.items;
   const currentIndex = allArticles.findIndex((a) => a.slug === params.slug);
 
   const relatedArticles = allArticles
@@ -60,24 +63,82 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         : null,
   };
 
+  // Build canonical URL
+  const baseUrl = process.env.SITE_URL || request.url.split("/article/")[0];
+  const canonicalUrl =
+    article.canonicalUrl || `${baseUrl}/article/${article.slug}`;
+
   return {
     article: { ...article, content: highlightedContent },
     relatedArticles,
     navigation,
     settings,
     isAuthenticated,
+    canonicalUrl,
   };
 }
 
 export function meta({ data }: Route.MetaArgs) {
   const article = data?.article;
   const siteName = data?.settings?.siteName || "Journal";
+  const canonicalUrl = data?.canonicalUrl;
+
+  if (!article) {
+    return [
+      { title: "Article Not Found" },
+      {
+        name: "description",
+        content: "The requested article could not be found.",
+      },
+    ];
+  }
+
+  // Get excerpt from content for description
+  const getExcerpt = (html: string, maxLength = 160) => {
+    const text = html.replace(/<[^>]*>/g, "");
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + "...";
+  };
+
+  const title = article.seoTitle || article.title;
+  const description =
+    article.seoDescription || article.subtitle || getExcerpt(article.content);
+  const keywords = article.seoKeywords || article.tags?.join(", ") || "";
+  const authorName = article.authorUser?.name || article.author;
+
   return [
-    { title: article ? `${article.title} - ${siteName}` : "Article Not Found" },
-    {
-      name: "description",
-      content: article?.subtitle || `Read this article on ${siteName}`,
-    },
+    { title: `${title} - ${siteName}` },
+    { name: "description", content: description },
+    { name: "keywords", content: keywords },
+    { name: "author", content: authorName },
+    // Canonical URL
+    ...(canonicalUrl
+      ? [{ tagName: "link", rel: "canonical", href: canonicalUrl }]
+      : []),
+    // Open Graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "article" },
+    { property: "og:url", content: canonicalUrl },
+    ...(article.heroImage
+      ? [{ property: "og:image", content: article.heroImage }]
+      : []),
+    { property: "og:site_name", content: siteName },
+    { property: "article:published_time", content: article.date },
+    { property: "article:author", content: authorName },
+    ...(article.category
+      ? [{ property: "article:section", content: article.category }]
+      : []),
+    ...(article.tags?.length
+      ? article.tags.map((tag) => ({ property: "article:tag", content: tag }))
+      : []),
+    // Twitter Card
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    ...(article.heroImage
+      ? [{ name: "twitter:image", content: article.heroImage }]
+      : []),
   ];
 }
 
@@ -85,6 +146,8 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
   const { article, relatedArticles, navigation, settings, isAuthenticated } =
     loaderData;
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,6 +161,69 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check if article is saved in localStorage
+  useEffect(() => {
+    if (article) {
+      const savedArticles = JSON.parse(
+        localStorage.getItem("savedArticles") || "[]"
+      );
+      setIsSaved(savedArticles.includes(article.slug));
+    }
+  }, [article]);
+
+  const handleSave = () => {
+    if (!article) return;
+    const savedArticles = JSON.parse(
+      localStorage.getItem("savedArticles") || "[]"
+    );
+    if (isSaved) {
+      const filtered = savedArticles.filter((s: string) => s !== article.slug);
+      localStorage.setItem("savedArticles", JSON.stringify(filtered));
+      setIsSaved(false);
+    } else {
+      savedArticles.push(article.slug);
+      localStorage.setItem("savedArticles", JSON.stringify(savedArticles));
+      setIsSaved(true);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = article?.title || "Article";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+      } catch {
+        // User cancelled or error
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(url);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    }
+  };
+
+  const handleShareTwitter = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(article?.title || "");
+    window.open(
+      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+      "_blank",
+      "width=550,height=420"
+    );
+  };
+
+  const handleShareLinkedIn = () => {
+    const url = encodeURIComponent(window.location.href);
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      "_blank",
+      "width=550,height=420"
+    );
+  };
 
   if (!article) {
     return (
@@ -140,8 +266,43 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
     );
   }
 
+  // Use author from user account if available, otherwise fall back to article.author
+  const authorName = article.authorUser?.name || article.author;
+  const authorImage =
+    article.authorUser?.image || "https://avatar.iran.liara.run/public";
+
+  // Generate JSON-LD structured data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.subtitle || "",
+    image: article.heroImage || "",
+    datePublished: article.date,
+    dateModified: article.updatedAt,
+    author: {
+      "@type": "Person",
+      name: authorName,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: settings.siteName,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+    },
+    ...(article.tags?.length ? { keywords: article.tags.join(", ") } : {}),
+    ...(article.category ? { articleSection: article.category } : {}),
+  };
+
   return (
     <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       {/* Reading Progress Bar */}
       <div id="progress-container">
         <div id="progress-bar" style={{ width: `${scrollProgress}%` }} />
@@ -167,6 +328,19 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
         <span className="category-tag">{article.category}</span>
         <h1>{article.title}</h1>
         <p className="subtitle">{article.subtitle}</p>
+        {article.tags && article.tags.length > 0 && (
+          <div className="article-tags">
+            {article.tags.map((tag) => (
+              <Link
+                key={tag}
+                to={`/?tag=${encodeURIComponent(tag)}`}
+                className="article-tag"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Hero Image */}
@@ -180,22 +354,70 @@ export default function ArticlePage({ loaderData }: Route.ComponentProps) {
       <div className="content-wrapper">
         {/* Sidebar */}
         <aside className="meta-sidebar">
-          <div className="author-block">
-            <img
-              src="https://avatar.iran.liara.run/public"
-              alt={article.author}
-              loading="lazy"
-            />
-            <p className="author-name">{article.author}</p>
+          <div className="sidebar-author">
+            <img src={authorImage} alt={authorName} loading="lazy" />
+            <div className="sidebar-author-info">
+              <span className="sidebar-author-label">Written by</span>
+              <p className="sidebar-author-name">{authorName}</p>
+            </div>
           </div>
-          <div className="meta-info">
-            <span>{article.date}</span>
-            <span>{article.readTime}</span>
+
+          <div className="sidebar-meta">
+            <div className="sidebar-meta-item">
+              <span className="sidebar-meta-label">Published</span>
+              <span className="sidebar-meta-value">{article.date}</span>
+            </div>
+            <div className="sidebar-meta-item">
+              <span className="sidebar-meta-label">Read time</span>
+              <span className="sidebar-meta-value">{article.readTime}</span>
+            </div>
           </div>
-          <div className="share-icons">
-            <span>Share</span>
-            <span>·</span>
-            <span>Save</span>
+
+          <div className="sidebar-actions">
+            <button
+              type="button"
+              className={`sidebar-action-btn ${isSaved ? "saved" : ""}`}
+              onClick={handleSave}
+              title={isSaved ? "Remove from saved" : "Save for later"}
+            >
+              <Bookmark
+                size={18}
+                fill={isSaved ? "currentColor" : "none"}
+                strokeWidth={1.5}
+              />
+              <span>{isSaved ? "Saved" : "Save"}</span>
+            </button>
+
+            <div className="sidebar-share">
+              <button
+                type="button"
+                className="sidebar-action-btn"
+                onClick={handleShare}
+                title="Share article"
+              >
+                <Share2 size={18} strokeWidth={1.5} />
+                <span>{showCopied ? "Copied!" : "Share"}</span>
+              </button>
+
+              <div className="sidebar-share-links">
+                <button
+                  type="button"
+                  onClick={handleShareTwitter}
+                  className="sidebar-share-link"
+                  title="Share on Twitter"
+                >
+                  <Twitter size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShareLinkedIn}
+                  className="sidebar-share-link"
+                  title="Share on LinkedIn"
+                >
+                  <Linkedin size={14} />
+                </button>
+              </div>
+            </div>
           </div>
         </aside>
 

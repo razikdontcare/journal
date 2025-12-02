@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ArrowUp } from "lucide-react";
 
 export function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,7 +26,7 @@ export function BackToTop() {
       onClick={scrollToTop}
       aria-label="Back to top"
     >
-      ↑
+      <ArrowUp size={20} />
     </button>
   );
 }

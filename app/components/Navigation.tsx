@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router";
 import { useState, useEffect } from "react";
+import { Search, LogIn } from "lucide-react";
 
 interface NavigationProps {
   siteName?: string;
@@ -57,8 +58,8 @@ export function Navigation({
 
   const navLinks = [
     { to: "/", label: "Home" },
+    { to: "/articles", label: "Articles" },
     { to: "/about", label: "About" },
-    { to: "/#journal", label: "Writing", isHash: true },
     ...(showNewsletter
       ? [{ to: "/#newsletter", label: "Subscribe", isHash: true }]
       : []),
@@ -103,6 +104,16 @@ export function Navigation({
                 </Link>
               )
             )}
+            <Link
+              to="/articles"
+              className="nav-search-link"
+              aria-label="Search articles"
+            >
+              <Search size={16} />
+            </Link>
+            <Link to="/login" className="nav-login-link" aria-label="Login">
+              <LogIn size={16} />
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -141,6 +152,20 @@ export function Navigation({
             </Link>
           )
         )}
+        <Link
+          to="/articles"
+          className="mobile-search-link"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          Search Articles
+        </Link>
+        <Link
+          to="/login"
+          className="mobile-login-link"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <LogIn size={16} /> Login
+        </Link>
       </div>
 
       {/* Spacer for fixed nav */}

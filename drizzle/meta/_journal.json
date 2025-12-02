@@ -43,6 +43,13 @@
       "when": 1764523413453,
       "tag": "0005_wide_nitro",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1764560633162,
+      "tag": "0006_high_whizzer",
+      "breakpoints": true
     }
   ]
 }

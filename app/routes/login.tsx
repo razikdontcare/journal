@@ -1,13 +1,23 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, redirect } from "react-router";
 import { useState } from "react";
 import type { Route } from "./+types/login";
 import { signIn } from "../lib/auth.client";
+import { getSession } from "../lib/auth.server";
+import { Mail, Lock, ArrowLeft, LogIn } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Login - Journal" },
     { name: "robots", content: "noindex, nofollow" },
   ];
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await getSession(request);
+  if (session) {
+    throw redirect("/admin");
+  }
+  return null;
 }
 
 export default function Login() {
@@ -56,7 +66,9 @@ export default function Login() {
           {error && <div className="auth-error">{error}</div>}
 
           <div className="auth-field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">
+              <Mail size={14} /> Email
+            </label>
             <input
               type="email"
               id="email"
@@ -69,7 +81,9 @@ export default function Login() {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              <Lock size={14} /> Password
+            </label>
             <input
               type="password"
               id="password"
@@ -82,6 +96,7 @@ export default function Login() {
           </div>
 
           <button type="submit" className="auth-submit" disabled={loading}>
+            <LogIn size={16} />
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
@@ -91,7 +106,7 @@ export default function Login() {
             Don't have an account? <Link to="/register">Create one</Link>
           </p>
           <Link to="/" className="auth-back">
-            ← Back to site
+            <ArrowLeft size={14} /> Back to site
           </Link>
         </div>
       </div>

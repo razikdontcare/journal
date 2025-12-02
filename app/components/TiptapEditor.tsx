@@ -18,6 +18,37 @@ import CharacterCount from "@tiptap/extension-character-count";
 import { FileHandler } from "@tiptap/extension-file-handler";
 import { common, createLowlight } from "lowlight";
 import { useEffect, useCallback, useState, useRef } from "react";
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Strikethrough,
+  Highlighter,
+  Subscript as SubscriptIcon,
+  Superscript as SuperscriptIcon,
+  Heading2,
+  Heading3,
+  Pilcrow,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  ListOrdered,
+  Quote,
+  Code,
+  Minus,
+  Link as LinkIcon,
+  ImageIcon,
+  Youtube as YoutubeIcon,
+  Table2,
+  Plus,
+  Trash2,
+  Undo,
+  Redo,
+  Maximize,
+  Minimize,
+  Loader2,
+} from "lucide-react";
 
 const lowlight = createLowlight(common);
 
@@ -138,7 +169,7 @@ function MenuBar({
           className={editor.isActive("bold") ? "active" : ""}
           title="Bold (Ctrl+B)"
         >
-          <strong>B</strong>
+          <Bold size={16} />
         </button>
         <button
           type="button"
@@ -146,7 +177,7 @@ function MenuBar({
           className={editor.isActive("italic") ? "active" : ""}
           title="Italic (Ctrl+I)"
         >
-          <em>I</em>
+          <Italic size={16} />
         </button>
         <button
           type="button"
@@ -154,7 +185,7 @@ function MenuBar({
           className={editor.isActive("underline") ? "active" : ""}
           title="Underline (Ctrl+U)"
         >
-          <u>U</u>
+          <UnderlineIcon size={16} />
         </button>
         <button
           type="button"
@@ -162,7 +193,7 @@ function MenuBar({
           className={editor.isActive("strike") ? "active" : ""}
           title="Strikethrough"
         >
-          <s>S</s>
+          <Strikethrough size={16} />
         </button>
         <button
           type="button"
@@ -170,7 +201,7 @@ function MenuBar({
           className={editor.isActive("highlight") ? "active" : ""}
           title="Highlight"
         >
-          <mark>H</mark>
+          <Highlighter size={16} />
         </button>
       </div>
 
@@ -184,7 +215,7 @@ function MenuBar({
           className={editor.isActive("subscript") ? "active" : ""}
           title="Subscript"
         >
-          X<sub>2</sub>
+          <SubscriptIcon size={16} />
         </button>
         <button
           type="button"
@@ -192,7 +223,7 @@ function MenuBar({
           className={editor.isActive("superscript") ? "active" : ""}
           title="Superscript"
         >
-          X<sup>2</sup>
+          <SuperscriptIcon size={16} />
         </button>
       </div>
 
@@ -208,7 +239,7 @@ function MenuBar({
           className={editor.isActive("heading", { level: 2 }) ? "active" : ""}
           title="Heading 2"
         >
-          H2
+          <Heading2 size={16} />
         </button>
         <button
           type="button"
@@ -218,7 +249,7 @@ function MenuBar({
           className={editor.isActive("heading", { level: 3 }) ? "active" : ""}
           title="Heading 3"
         >
-          H3
+          <Heading3 size={16} />
         </button>
         <button
           type="button"
@@ -226,7 +257,7 @@ function MenuBar({
           className={editor.isActive("paragraph") ? "active" : ""}
           title="Paragraph"
         >
-          ¶
+          <Pilcrow size={16} />
         </button>
       </div>
 
@@ -240,7 +271,7 @@ function MenuBar({
           className={editor.isActive({ textAlign: "left" }) ? "active" : ""}
           title="Align Left"
         >
-          ⇤
+          <AlignLeft size={16} />
         </button>
         <button
           type="button"
@@ -248,7 +279,7 @@ function MenuBar({
           className={editor.isActive({ textAlign: "center" }) ? "active" : ""}
           title="Align Center"
         >
-          ⇔
+          <AlignCenter size={16} />
         </button>
         <button
           type="button"
@@ -256,7 +287,7 @@ function MenuBar({
           className={editor.isActive({ textAlign: "right" }) ? "active" : ""}
           title="Align Right"
         >
-          ⇥
+          <AlignRight size={16} />
         </button>
       </div>
 
@@ -270,7 +301,7 @@ function MenuBar({
           className={editor.isActive("bulletList") ? "active" : ""}
           title="Bullet List"
         >
-          •
+          <List size={16} />
         </button>
         <button
           type="button"
@@ -278,7 +309,7 @@ function MenuBar({
           className={editor.isActive("orderedList") ? "active" : ""}
           title="Numbered List"
         >
-          1.
+          <ListOrdered size={16} />
         </button>
       </div>
 
@@ -292,7 +323,7 @@ function MenuBar({
           className={editor.isActive("blockquote") ? "active" : ""}
           title="Quote"
         >
-          "
+          <Quote size={16} />
         </button>
         <button
           type="button"
@@ -300,14 +331,14 @@ function MenuBar({
           className={editor.isActive("codeBlock") ? "active" : ""}
           title="Code Block"
         >
-          {"</>"}
+          <Code size={16} />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           title="Horizontal Rule"
         >
-          ―
+          <Minus size={16} />
         </button>
       </div>
 
@@ -321,7 +352,7 @@ function MenuBar({
           className={editor.isActive("link") ? "active" : ""}
           title="Add Link"
         >
-          🔗
+          <LinkIcon size={16} />
         </button>
         <button
           type="button"
@@ -329,7 +360,11 @@ function MenuBar({
           title="Add Image (URL or Upload)"
           disabled={isUploading}
         >
-          {isUploading ? "⏳" : "🖼️"}
+          {isUploading ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <ImageIcon size={16} />
+          )}
         </button>
         <input
           ref={fileInputRef}
@@ -343,7 +378,7 @@ function MenuBar({
           onClick={addYoutubeVideo}
           title="Add YouTube Video"
         >
-          ▶️
+          <YoutubeIcon size={16} />
         </button>
       </div>
 
@@ -352,7 +387,7 @@ function MenuBar({
       {/* Table */}
       <div className="toolbar-group">
         <button type="button" onClick={addTable} title="Insert Table">
-          ⊞
+          <Table2 size={16} />
         </button>
         {editor.isActive("table") && (
           <>
@@ -361,21 +396,23 @@ function MenuBar({
               onClick={() => editor.chain().focus().addColumnAfter().run()}
               title="Add Column"
             >
-              +Col
+              <Plus size={14} />
+              Col
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().addRowAfter().run()}
               title="Add Row"
             >
-              +Row
+              <Plus size={14} />
+              Row
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().deleteTable().run()}
               title="Delete Table"
             >
-              ✕
+              <Trash2 size={14} />
             </button>
           </>
         )}
@@ -391,7 +428,7 @@ function MenuBar({
           disabled={!editor.can().undo()}
           title="Undo (Ctrl+Z)"
         >
-          ↩
+          <Undo size={16} />
         </button>
         <button
           type="button"
@@ -399,7 +436,7 @@ function MenuBar({
           disabled={!editor.can().redo()}
           title="Redo (Ctrl+Y)"
         >
-          ↪
+          <Redo size={16} />
         </button>
       </div>
     </div>
@@ -586,7 +623,7 @@ export function TiptapEditor({
           onClick={toggleFullscreen}
           title={isFullscreen ? "Exit Fullscreen (ESC)" : "Fullscreen"}
         >
-          {isFullscreen ? "⛶" : "⛶"}
+          {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
         </button>
       </div>
       <EditorContent editor={editor} />

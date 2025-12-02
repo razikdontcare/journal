@@ -12,9 +12,6 @@ const DEFAULT_SETTINGS: Omit<SiteSettings, "createdAt" | "updatedAt"> = {
   siteTagline: "A personal blog about life, thoughts, and creativity.",
   siteDescription:
     "Welcome to my personal blog where I share my thoughts, experiences, and creative endeavors.",
-  authorName: "Journal",
-  authorBio: null,
-  authorImage: null,
   socialTwitter: null,
   socialGithub: null,
   socialLinkedin: null,

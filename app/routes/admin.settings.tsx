@@ -1,9 +1,17 @@
 import { Link, redirect, useNavigation } from "react-router";
 import { useState, useEffect } from "react";
 import type { Route } from "./+types/admin.settings";
-import { getSiteSettings, updateSiteSettings } from "../lib/settings.server";
-import { requireAuth } from "../lib/auth.server";
 import { signOut } from "../lib/auth.client";
+import {
+  FileText,
+  Image,
+  Settings,
+  Users,
+  ExternalLink,
+  LogOut,
+  Check,
+  Save,
+} from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,14 +22,32 @@ export function meta({}: Route.MetaArgs) {
 
 // Server-side loader
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireAuth(request);
+  const { requireAuthWithRole } = await import("../lib/auth.server");
+  const { getSiteSettings } = await import("../lib/settings.server");
+
+  const session = await requireAuthWithRole(request);
+
+  // Only admin and editor can access settings
+  if (session.user.role !== "admin" && session.user.role !== "editor") {
+    throw redirect("/admin");
+  }
+
   const settings = await getSiteSettings();
-  return { settings };
+  return { settings, user: session.user };
 }
 
 // Server-side action for update
 export async function action({ request }: Route.ActionArgs) {
-  await requireAuth(request);
+  const { requireAuthWithRole } = await import("../lib/auth.server");
+  const { updateSiteSettings } = await import("../lib/settings.server");
+
+  const session = await requireAuthWithRole(request);
+
+  // Only admin and editor can update settings
+  if (session.user.role !== "admin" && session.user.role !== "editor") {
+    throw redirect("/admin");
+  }
+
   const formData = await request.formData();
 
   await updateSiteSettings({
@@ -29,10 +55,6 @@ export async function action({ request }: Route.ActionArgs) {
     siteName: formData.get("siteName") as string,
     siteTagline: formData.get("siteTagline") as string,
     siteDescription: formData.get("siteDescription") as string,
-    // Author
-    authorName: formData.get("authorName") as string,
-    authorBio: (formData.get("authorBio") as string) || null,
-    authorImage: (formData.get("authorImage") as string) || null,
     // Social
     socialTwitter: (formData.get("socialTwitter") as string) || null,
     socialGithub: (formData.get("socialGithub") as string) || null,
@@ -79,7 +101,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function AdminSettings({ loaderData }: Route.ComponentProps) {
-  const { settings } = loaderData;
+  const { settings, user } = loaderData;
   const navigation = useNavigation();
   const saving = navigation.state === "submitting";
   const [saved, setSaved] = useState(false);
@@ -104,13 +126,40 @@ export default function AdminSettings({ loaderData }: Route.ComponentProps) {
           </Link>
           <nav className="admin-nav">
             <Link to="/admin" className="admin-nav-link">
+              <FileText size={16} />
               Articles
             </Link>
+            <Link to="/admin/media" className="admin-nav-link">
+              <Image size={16} />
+              Media
+            </Link>
             <Link to="/admin/settings" className="admin-nav-link active">
+              <Settings size={16} />
               Settings
             </Link>
-            <Link to="/" className="admin-nav-link">
+            {user.role === "admin" && (
+              <Link to="/admin/users" className="admin-nav-link">
+                <Users size={16} />
+                Users
+              </Link>
+            )}
+            <span className="admin-nav-divider" />
+            <Link to="/" className="admin-nav-link view-site">
+              <ExternalLink size={14} />
               View Site
+            </Link>
+            <Link
+              to="/admin/profile"
+              className="admin-nav-link admin-profile-link"
+              title="My Profile"
+            >
+              <span className="profile-avatar-small">
+                {user.image ? (
+                  <img src={user.image} alt={user.name} />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
+              </span>
             </Link>
             <button
               type="button"
@@ -119,6 +168,7 @@ export default function AdminSettings({ loaderData }: Route.ComponentProps) {
                 signOut().then(() => (window.location.href = "/login"))
               }
             >
+              <LogOut size={14} />
               Logout
             </button>
           </nav>
@@ -136,7 +186,11 @@ export default function AdminSettings({ loaderData }: Route.ComponentProps) {
                 Configure your blog's appearance and information
               </p>
             </div>
-            {saved && <div className="admin-saved-badge">✓ Settings saved</div>}
+            {saved && (
+              <div className="admin-saved-badge">
+                <Check size={14} /> Settings saved
+              </div>
+            )}
           </div>
 
           {/* Settings Form */}
@@ -471,43 +525,6 @@ export default function AdminSettings({ loaderData }: Route.ComponentProps) {
                     name="newsletterImage"
                     defaultValue={settings.newsletterImage || ""}
                     placeholder="https://example.com/newsletter-bg.jpg"
-                  />
-                </div>
-              </div>
-            </section>
-
-            {/* Author Settings */}
-            <section className="admin-settings-section">
-              <h2 className="admin-settings-section-title">Author</h2>
-              <div className="admin-settings-grid">
-                <div className="admin-form-group">
-                  <label htmlFor="authorName">Author Name</label>
-                  <input
-                    type="text"
-                    id="authorName"
-                    name="authorName"
-                    defaultValue={settings.authorName || ""}
-                    placeholder="Your name"
-                  />
-                </div>
-                <div className="admin-form-group">
-                  <label htmlFor="authorImage">Author Image URL</label>
-                  <input
-                    type="url"
-                    id="authorImage"
-                    name="authorImage"
-                    defaultValue={settings.authorImage || ""}
-                    placeholder="https://example.com/photo.jpg"
-                  />
-                </div>
-                <div className="admin-form-group full-width">
-                  <label htmlFor="authorBio">Author Bio</label>
-                  <textarea
-                    id="authorBio"
-                    name="authorBio"
-                    defaultValue={settings.authorBio || ""}
-                    placeholder="A short bio about yourself"
-                    rows={3}
                   />
                 </div>
               </div>

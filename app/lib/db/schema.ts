@@ -1,4 +1,17 @@
-import { pgTable, text, timestamp, boolean, uuid } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  uuid,
+  integer,
+} from "drizzle-orm/pg-core";
+
+// =========================================
+// User Roles
+// =========================================
+
+export type UserRole = "admin" | "editor" | "author";
 
 // =========================================
 // Better Auth Tables
@@ -10,6 +23,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  role: text("role").$type<UserRole>().notNull().default("author"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -64,13 +78,41 @@ export const articles = pgTable("articles", {
   title: text("title").notNull(),
   subtitle: text("subtitle"),
   category: text("category"),
+  tags: text("tags").array(),
   date: text("date").notNull(),
   readTime: text("read_time"),
   author: text("author").notNull().default("Journal"),
   heroImage: text("hero_image"),
+  heroImageCaption: text("hero_image_caption"),
   content: text("content").notNull(),
   published: boolean("published").notNull().default(false),
+  // SEO Fields
+  seoTitle: text("seo_title"),
+  seoDescription: text("seo_description"),
+  seoKeywords: text("seo_keywords"),
+  canonicalUrl: text("canonical_url"),
+  // Author relationship
   authorId: text("author_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Media table for file uploads
+export const media = pgTable("media", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  filename: text("filename").notNull(),
+  originalFilename: text("original_filename").notNull(),
+  url: text("url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  mimeType: text("mime_type").notNull(),
+  size: integer("size").notNull(),
+  width: integer("width"),
+  height: integer("height"),
+  altText: text("alt_text"),
+  caption: text("caption"),
+  uploadedBy: text("uploaded_by").references(() => users.id, {
     onDelete: "set null",
   }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -86,9 +128,6 @@ export const siteSettings = pgTable("site_settings", {
   siteDescription: text("site_description").default(
     "Welcome to my personal blog where I share my thoughts, experiences, and creative endeavors."
   ),
-  authorName: text("author_name").default("Journal"),
-  authorBio: text("author_bio"),
-  authorImage: text("author_image"),
   socialTwitter: text("social_twitter"),
   socialGithub: text("social_github"),
   socialLinkedin: text("social_linkedin"),
@@ -161,3 +200,5 @@ export type Article = typeof articles.$inferSelect;
 export type NewArticle = typeof articles.$inferInsert;
 export type SiteSettings = typeof siteSettings.$inferSelect;
 export type NewSiteSettings = typeof siteSettings.$inferInsert;
+export type Media = typeof media.$inferSelect;
+export type NewMedia = typeof media.$inferInsert;

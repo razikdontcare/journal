@@ -1,5 +1,10 @@
 // S3-compatible storage client for image uploads
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import { createMedia, deleteMedia, getMediaByUrl } from "./media.server";
 
 // Initialize S3 client with environment variables
 // For custom domain S3-compatible storage with bucketEndpoint
@@ -22,6 +27,7 @@ const PUBLIC_URL = process.env.S3_PUBLIC_URL || process.env.S3_ENDPOINT; // Cust
 export interface UploadResult {
   success: boolean;
   url?: string;
+  mediaId?: string;
   error?: string;
 }
 
@@ -38,6 +44,15 @@ function generateFilename(originalName: string): string {
     .substring(0, 50); // Limit length
 
   return `uploads/${timestamp}-${random}-${safeName}.${extension}`;
+}
+
+/**
+ * Generate thumbnail filename
+ */
+function generateThumbnailFilename(filename: string): string {
+  const parts = filename.split(".");
+  const extension = parts.pop();
+  return `${parts.join(".")}-thumb.${extension}`;
 }
 
 /**
@@ -59,7 +74,8 @@ function isValidImageType(mimeType: string): boolean {
  */
 export async function uploadImage(
   file: File | Blob,
-  originalFilename: string
+  originalFilename: string,
+  uploadedBy?: string
 ): Promise<UploadResult> {
   try {
     // Validate file type
@@ -101,15 +117,65 @@ export async function uploadImage(
     // Construct public URL
     const publicUrl = `${PUBLIC_URL}/${key}`;
 
+    // Save to media table if uploadedBy is provided
+    let mediaId: string | undefined;
+    if (uploadedBy) {
+      const mediaRecord = await createMedia({
+        filename: key,
+        originalFilename,
+        url: publicUrl,
+        mimeType: file.type,
+        size: file.size,
+        uploadedBy,
+      });
+      mediaId = mediaRecord.id;
+    }
+
     return {
       success: true,
       url: publicUrl,
+      mediaId,
     };
   } catch (error) {
     console.error("S3 upload error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
+    };
+  }
+}
+
+/**
+ * Delete an image from S3-compatible storage
+ */
+export async function deleteImage(
+  url: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Extract key from URL
+    const urlObj = new URL(url);
+    const key = urlObj.pathname.replace(/^\//, "");
+
+    // Delete from S3
+    const command = new DeleteObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+
+    await s3Client.send(command);
+
+    // Delete from media table
+    const mediaRecord = await getMediaByUrl(url);
+    if (mediaRecord) {
+      await deleteMedia(mediaRecord.id);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("S3 delete error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Delete failed",
     };
   }
 }

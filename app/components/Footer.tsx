@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Twitter, Github, Linkedin, Instagram } from "lucide-react";
 
 interface FooterProps {
   siteName?: string;
@@ -50,7 +51,7 @@ export function Footer({
               rel="noopener noreferrer"
               aria-label="Twitter"
             >
-              𝕏
+              <Twitter size={18} />
             </a>
           )}
           {socialGithub && (
@@ -60,7 +61,7 @@ export function Footer({
               rel="noopener noreferrer"
               aria-label="GitHub"
             >
-              GitHub
+              <Github size={18} />
             </a>
           )}
           {socialLinkedin && (
@@ -70,7 +71,7 @@ export function Footer({
               rel="noopener noreferrer"
               aria-label="LinkedIn"
             >
-              LinkedIn
+              <Linkedin size={18} />
             </a>
           )}
           {socialInstagram && (
@@ -80,7 +81,7 @@ export function Footer({
               rel="noopener noreferrer"
               aria-label="Instagram"
             >
-              Instagram
+              <Instagram size={18} />
             </a>
           )}
         </div>

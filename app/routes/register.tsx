@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Route } from "./+types/register";
 import { signUp } from "../lib/auth.client";
 import { getSiteSettings } from "../lib/settings.server";
+import { User, Mail, Lock, ArrowLeft, UserPlus } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -44,7 +45,7 @@ export default function Register({ loaderData }: Route.ComponentProps) {
               Already have an account? <Link to="/login">Sign in</Link>
             </p>
             <Link to="/" className="auth-back">
-              ← Back to site
+              <ArrowLeft size={14} /> Back to site
             </Link>
           </div>
         </div>
@@ -103,7 +104,9 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           {error && <div className="auth-error">{error}</div>}
 
           <div className="auth-field">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">
+              <User size={14} /> Name
+            </label>
             <input
               type="text"
               id="name"
@@ -116,7 +119,9 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">
+              <Mail size={14} /> Email
+            </label>
             <input
               type="email"
               id="email"
@@ -129,7 +134,9 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              <Lock size={14} /> Password
+            </label>
             <input
               type="password"
               id="password"
@@ -142,7 +149,9 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">
+              <Lock size={14} /> Confirm Password
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -155,6 +164,7 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           </div>
 
           <button type="submit" className="auth-submit" disabled={loading}>
+            <UserPlus size={16} />
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
@@ -164,7 +174,7 @@ export default function Register({ loaderData }: Route.ComponentProps) {
             Already have an account? <Link to="/login">Sign in</Link>
           </p>
           <Link to="/" className="auth-back">
-            ← Back to site
+            <ArrowLeft size={14} /> Back to site
           </Link>
         </div>
       </div>
