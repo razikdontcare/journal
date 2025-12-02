@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to build (e.g., v1.0.0)'
+        description: "Tag to build (e.g., v1.0.0)"
         required: false
-        default: 'latest'
+        default: "latest"
 
 env:
   REGISTRY: ghcr.io
@@ -57,4 +57,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64

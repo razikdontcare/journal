@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
-FROM oven/bun:1
+FROM node:20-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
 
@@ -18,4 +18,4 @@ COPY --from=production-deps /app/node_modules /app/node_modules
 COPY --from=build /app/build /app/build
 COPY package.json server.js ./
 
-CMD ["bun", "run", "start"]
+CMD ["npm", "run", "start"]
